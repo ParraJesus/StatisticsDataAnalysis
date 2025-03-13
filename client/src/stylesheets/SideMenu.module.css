@@ -1,0 +1,111 @@
+.sideMenu {
+  background-color: var(--blue_0);
+  min-width: 60px;
+  width: 60px;
+  height: 100vh;
+  color: var(--white);
+  transition: min-width 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+}
+
+.expanded {
+  min-width: 200px;
+}
+
+.sideMenu_logo_container {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  overflow: hidden;
+}
+
+.sideMenu_logo_container p {
+  color: var(--white);
+}
+
+.img_container {
+  height: 40px;
+  width: 40px;
+  background-color: #fff;
+  background-image: url("https://cdna.artstation.com/p/assets/images/images/075/917/646/large/gabriel-parra-4.jpg?1715737858");
+  background-position: center;
+  background-size: cover;
+  border-radius: 100%;
+  margin: 5px;
+}
+
+.sideMenu_item_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.sideMenu_item {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  margin: 10px 0;
+  padding: 5px;
+  border-radius: 2px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sideMenu_item:hover {
+  background-color: #354658;
+}
+
+.sideMenu_item:active {
+  opacity: 80%;
+}
+
+.sideMenu_item p {
+  color: var(--white);
+  font-size: 12px;
+}
+
+.sideMenu_item_subitems {
+  transition: display 0.3s ease;
+}
+
+.list_icon {
+  color: aliceblue;
+  fill: var(--white);
+  height: 24px;
+  width: 24px;
+  margin: 2px;
+}
+
+.lookingUp {
+  rotate: -90deg;
+}
+
+.lookingDown {
+  rotate: 90deg;
+}
+
+.ul {
+  font-size: 12px;
+  color: var(--white);
+  list-style: none;
+}
+
+.li {
+  color: var(--white);
+  margin: 10px 0;
+  margin-left: 20px;
+}
+
+.subitem_link {
+  color: var(--white);
+  text-decoration: none;
+  margin: 10px 0;
+}
+
+.subitem_link:active,
+.subitem_link:hover {
+  text-decoration: underline;
+}

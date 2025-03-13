@@ -1,0 +1,53 @@
+.header_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--blue_1);
+  border-bottom: 2px solid var(--blue_3);
+  width: 100%;
+  min-height: 50px;
+  /*
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(
+      to right,
+      #475678 0%,
+      #475678 6.66%,
+      #79adc0 6.66%,
+      #79adc0 13.33%,
+      #b5eaec 13.33%,
+      #b5eaec 20%,
+      #475678 20%,
+      #475678 26.66%,
+      #79adc0 26.66%,
+      #79adc0 33.33%,
+      #b5eaec 33.33%,
+      #b5eaec 40%,
+      #475678 40%,
+      #475678 46.66%,
+      #79adc0 46.66%,
+      #79adc0 53.33%,
+      #b5eaec 53.33%,
+      #b5eaec 60%,
+      #475678 60%,
+      #475678 66.66%,
+      #79adc0 66.66%,
+      #79adc0 73.33%,
+      #b5eaec 73.33%,
+      #b5eaec 80%,
+      #475678 80%,
+      #475678 86.66%,
+      #79adc0 86.66%,
+      #79adc0 93.33%,
+      #b5eaec 93.33%,
+      #b5eaec 100%
+    )
+    1;*/
+}
+
+.h1 {
+  color: var(--white);
+}
+
+.shadow {
+  box-shadow: 0 0 20px 1px var(--shadow-color-2);
+}

@@ -1,0 +1,21 @@
+.footer_container {
+  color: var(--white);
+  background-color: var(--blue_1);
+  border-top: 2px solid var(--blue_3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 160px;
+}
+
+.footer_p {
+  color: var(--white);
+  text-align: center;
+  line-height: 2;
+  font-size: 14px;
+}
+
+.shadow {
+  box-shadow: 0 0 20px 1px var(--shadow-color-2);
+}

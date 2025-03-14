@@ -1,0 +1,79 @@
+.form {
+  margin: 20px 0;
+}
+
+.label {
+  font-family: "Roboto", sans-serif;
+  color: var(--paragrahp_color);
+  font-weight: bold;
+}
+
+.textArea {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  color: var(--paragrahp_color);
+  background-color: #f1f1f1;
+  border: none;
+  border-bottom: 2px solid var(--blue_2);
+  resize: none;
+  outline: none;
+  width: 100% !important;
+  height: 250px !important;
+  padding: 10px;
+  margin: 10px 0 20px 0;
+}
+
+.input[type="text"] {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  background-color: #f0f0f0;
+  color: var(--paragrahp_color);
+  border: none;
+  border-bottom: 2px solid var(--blue_2);
+  outline: none;
+  width: 100%;
+  margin: 10px 0 20px 0;
+  padding: 10px;
+}
+
+.no_selectable {
+  background-color: #f0f0f0;
+}
+
+.button_general {
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0.1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button_first {
+  background-color: var(--blue_2);
+  color: var(--white);
+  border: none;
+  padding: 10px;
+}
+
+.button_second {
+  background-color: transparent;
+  border: 2px solid var(--blue_2);
+  color: var(--blue_2);
+  padding: 8px;
+}
+
+.button_general:hover {
+  opacity: 0.8;
+}
+
+.button_first:active {
+  background-color: var(--blue_1);
+}
+
+.highlighted_Button {
+  background-color: var(--highlighted-button_color);
+}
+
+.highlighted_Button:active {
+  background-color: var(--highlighted-button_color_active);
+}

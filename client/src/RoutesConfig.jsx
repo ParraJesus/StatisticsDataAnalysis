@@ -35,7 +35,7 @@ const routes = [
         element: <FilterBP1 />,
       },
       {
-        path: "boxplo2",
+        path: "boxplot2",
         element: <FilterBP2 />,
       },
     ],

@@ -8,12 +8,15 @@
   --blue_1: #5e7c9e;
   --blue_2: #79adc0;
   --blue_3: #b5eaec;
-  --green_0: #95c267;
-  --magenta_0: #e496f0;
+  --graph-color_1: #95c267;
+  --graph-color_2: #e496f0;
   --white: #ebebeb;
 
   --shadow-color-1: #000a;
   --shadow-color-2: #0006;
+
+  --highlighted-button_color: #e4794b;
+  --highlighted-button_color_active: #c05d3e;
 
   font-size: 14px;
 }
@@ -41,6 +44,7 @@ h2 {
   font-size: 18px;
   font-weight: bold;
   text-align: left;
+  margin: 20px 0;
 }
 
 p {
@@ -51,6 +55,7 @@ p {
 
 hr {
   border: none;
-  height: 2px;
+  height: 1px;
   background-color: var(--blue_3);
+  margin: 40px 0;
 }

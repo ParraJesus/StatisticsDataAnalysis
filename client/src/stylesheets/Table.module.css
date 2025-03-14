@@ -1,0 +1,36 @@
+.table {
+  border-collapse: collapse;
+  font-family: sans-serif;
+  min-width: 400px;
+  width: 100%;
+
+  color: var(--paragrahp_color);
+  background-color: var(--white);
+}
+
+.table thead tr {
+  background-color: var(--blue_2);
+  color: #ffffff;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+}
+
+.table td {
+  vertical-align: top;
+}
+
+.table tbody tr:nth-of-type(even) {
+  background-color: #f1f1f1;
+}
+
+.table tbody tr {
+  background-color: #ffffff;
+}
+
+.table tbody tr:last-of-type {
+  border-bottom: 2px solid var(--blue_2);
+}

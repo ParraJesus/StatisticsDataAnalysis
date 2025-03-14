@@ -11,6 +11,10 @@ const routeTitles = {
   "/onedimensional/filters/zscore2": "Second Z Score Filter",
   "/onedimensional/filters/boxplot1": "First Boxplot Filter",
   "/onedimensional/filters/boxplot2": "Second Boxplot Filter",
+  "/onedimensional/tabulation": "Data Tabulation",
+  "/onedimensional/synthetic": "Synthetic Data Generation",
+  "/twodimensional/tabulation": "Two Dimensional Relative Frecuencies",
+  "/multidimensional/correlation": "Linear Correlation Matrix",
 };
 
 const Layout = () => {

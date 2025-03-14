@@ -4,6 +4,7 @@ import styles from "../stylesheets/SideMenu.module.css";
 //Icons
 import { ReactComponent as OneDimensionalIcon } from "../assets/icons/one_dimensional_icon.svg";
 import { ReactComponent as TwoDimensionalIcon } from "../assets/icons/two_dimensional_icon.svg";
+import { ReactComponent as MultiDimensionalIcon } from "../assets/icons/multi_dimensional_icon.svg";
 
 //Components
 import SideMenuItem from "./SideMenuItem";
@@ -33,12 +34,35 @@ const SideMenu = () => {
           text: "Second boxplot filter",
           link: "/onedimensional/filters/boxplot2",
         },
+        {
+          text: "Data Tabulation",
+          link: "/onedimensional/tabulation",
+        },
+        {
+          text: "Synthetic Data",
+          link: "/onedimensional/synthetic",
+        },
       ],
     },
     {
       text: "Two Dimensional Data",
       icon: TwoDimensionalIcon,
-      subItems: [{}],
+      subItems: [
+        {
+          text: "Data Tabulation",
+          link: "/twodimensional/tabulation",
+        },
+      ],
+    },
+    {
+      text: "Multi Dimensional Data",
+      icon: MultiDimensionalIcon,
+      subItems: [
+        {
+          text: "Linear Correlation",
+          link: "/multidimensional/correlation",
+        },
+      ],
     },
   ];
 
@@ -83,7 +107,9 @@ const SideMenu = () => {
               title="Gabriel Parra"
             ></div>
             <p>
-              <strong>Statistic Data Analysis</strong>
+              <strong>
+                Statistic Data <br /> Analysis
+              </strong>
             </p>
           </div>
           {sideMenuData.map((menuItem, index) => (

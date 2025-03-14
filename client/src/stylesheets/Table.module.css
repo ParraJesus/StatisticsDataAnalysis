@@ -1,7 +1,12 @@
+.table_container {
+  overflow: hidden;
+  overflow-x: auto;
+}
+
 .table {
   border-collapse: collapse;
   font-family: sans-serif;
-  min-width: 400px;
+  min-width: 800px;
   width: 100%;
 
   color: var(--paragrahp_color);

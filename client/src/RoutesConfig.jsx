@@ -1,3 +1,5 @@
+import { Navigate } from "react-router-dom";
+
 //Layout
 import Layout from "./static/Layout.jsx";
 
@@ -18,7 +20,7 @@ const routes = [
     children: [
       {
         path: "",
-        element: <FilterZ1 />,
+        element: <Navigate to="/onedimensional/filters/zscore1" replace />,
       },
     ],
   },

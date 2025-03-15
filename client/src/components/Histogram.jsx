@@ -14,7 +14,7 @@ import { ReactComponent as ChevronIcon } from "../assets/icons/chevron_icon.svg"
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const BarChart = ({ datasets, groupsAmount = 10, showButtons }) => {
+const BarChart = ({ datasets, groupsAmount = 10, includeControls }) => {
   const [maxDataSetIndex] = useState(datasets.length - 1);
   const [dataSetIndex, setDataSetIndex] = useState(0);
   const [currentDataset, setCurrentDataset] = useState(datasets[0]);
@@ -99,7 +99,7 @@ const BarChart = ({ datasets, groupsAmount = 10, showButtons }) => {
   return (
     <div className={`${styles.graph_container}`}>
       <Bar data={data} options={options} />
-      {showButtons && (
+      {includeControls && (
         <div className={`${styles.graph_button_container}`}>
           <button
             className={`${styles.icon_button} ${styles.left} ${

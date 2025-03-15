@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import BarChart from "../../components/Histogram";
 
 import styles from "../../stylesheets/Layout.module.css";
@@ -189,7 +188,7 @@ const Page = () => {
           <BarChart
             key={JSON.stringify(iterationsData.remainingItems)}
             datasets={iterationsData.remainingItems}
-            showButtons={true}
+            includeControls={true}
           />
           <hr />
           <h2>Data After Filter</h2>

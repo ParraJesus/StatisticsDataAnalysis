@@ -3,10 +3,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  overflow-x: auto;
 }
 
-.graph_container canvas {
+.canvas {
   min-width: 100%;
+  min-width: 400px !important;
 }
 
 .graph_button_container {

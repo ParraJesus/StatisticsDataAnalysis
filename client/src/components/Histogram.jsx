@@ -59,20 +59,18 @@ const BarChart = ({ datasets, groupsAmount = 10, includeControls }) => {
   };
 
   let { labels, bins } = calculateGroups(currentDataset, groupsAmount);
-
   const data = {
     labels: labels,
     datasets: [
       {
         label: `Iteration ${dataSetIndex + 1}`,
         data: bins,
-        backgroundColor: "#95c267AA",
-        borderColor: "#95c267",
+        backgroundColor: "#95d455AA",
+        borderColor: "#95d455",
         borderWidth: 2,
       },
     ],
   };
-
   const options = {
     responsive: true,
     plugins: {
@@ -81,10 +79,10 @@ const BarChart = ({ datasets, groupsAmount = 10, includeControls }) => {
     },
     scales: {
       x: {
-        title: { display: true, text: "Values Ranges" },
+        title: { display: true, text: "" },
       },
       y: {
-        title: { display: true, text: "Density" },
+        title: { display: true, text: "" },
       },
     },
     datasets: {

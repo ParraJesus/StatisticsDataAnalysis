@@ -134,7 +134,6 @@ const Page = () => {
     let outliers = dataset.filter(
       (value) => value < lowerWhisker || value > upperWhisker
     );
-
     if (outliers.length > 0) {
       let farthestOutlier = outliers.reduce((max, value) => {
         let distance =

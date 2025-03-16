@@ -15,7 +15,6 @@ import { Chart } from "react-chartjs-2";
 import styles from "../stylesheets/Graph.module.css";
 import { ReactComponent as ChevronIcon } from "../assets/icons/chevron_icon.svg";
 
-// Registrar escalas y el controlador de Boxplot
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -53,9 +52,9 @@ const Boxplot = ({ dataset, includeControls }) => {
     labels: ["Data"],
     datasets: [
       {
-        label: `Iteración ${currentDataSetIndex + 1}`,
-        backgroundColor: "#DB7FEAAA",
-        borderColor: "#DB7FEA",
+        label: `Iteration ${currentDataSetIndex + 1}`,
+        backgroundColor: "#b587e9AA",
+        borderColor: "#b587e9",
         borderWidth: 1,
         outlierRadius: 3,
         outlierBackgroundColor: "#E95D5D",
@@ -83,7 +82,7 @@ const Boxplot = ({ dataset, includeControls }) => {
     },
     scales: {
       x: {
-        title: { display: true, text: "Valores" },
+        title: { display: true, text: "Values" },
         beginAtZero: true,
         suggestedMin: Math.min(
           dataset.lowerWhiskers[currentDataSetIndex],

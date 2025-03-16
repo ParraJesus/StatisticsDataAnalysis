@@ -5,6 +5,7 @@
   align-items: center;
   overflow: hidden;
   overflow-x: auto;
+  width: 100%;
 }
 
 .canvas {
@@ -35,7 +36,7 @@
 }
 
 .icon_button_disable {
-  background-color: var(--subtitle_color);
+  background-color: #d3d3d3;
   cursor: default;
 }
 

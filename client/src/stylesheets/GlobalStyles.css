@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 :root {
+  /*
   --title_color: #4d4d4d;
   --subtitle_color: #737373;
   --paragrahp_color: #858585;
@@ -8,8 +9,16 @@
   --blue_1: #5e7c9e;
   --blue_2: #79adc0;
   --blue_3: #b5eaec;
-  --graph-color_1: #95c267;
-  --graph-color_2: #e496f0;
+  */
+  --title_color: #4d4d4d;
+  --subtitle_color: #737373;
+  --paragrahp_color: #858585;
+  --blue_0: #171b22;
+  --blue_1: #1f2731;
+  --blue_2: #1d292e;
+  --blue_3: #2f3d6e;
+  --graph-color_1: #95d455;
+  --graph-color_2: #b587e9;
   --white: #ebebeb;
 
   --shadow-color-1: #000a;

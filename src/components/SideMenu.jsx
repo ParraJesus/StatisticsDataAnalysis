@@ -49,7 +49,7 @@ const SideMenu = () => {
       icon: TwoDimensionalIcon,
       subItems: [
         {
-          text: "Data Tabulation",
+          text: "Two-Ways Data Tabulation",
           link: "/twodimensional/tabulation",
         },
       ],

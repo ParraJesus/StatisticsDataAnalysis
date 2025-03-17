@@ -19,6 +19,12 @@
   text-align: left;
 }
 
+.table .highlighted_row {
+  background-color: var(--blue_2);
+  color: #ffffff;
+  font-weight: bold;
+}
+
 .table th,
 .table td {
   padding: 12px 15px;

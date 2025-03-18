@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import { isArray } from "chart.js/helpers";
 
 import styles from "../../stylesheets/Layout.module.css";
 import formStyles from "../../stylesheets/Form.module.css";
 import tableStyles from "../../stylesheets/Table.module.css";
-import { isArray } from "chart.js/helpers";
 
 const Page = () => {
   const [rawDataSet, setRawDataSet] = useState([]);

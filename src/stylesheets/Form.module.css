@@ -24,7 +24,8 @@
 }
 
 .input[type="text"],
-.input[type="number"] {
+.input[type="number"],
+.option {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   background-color: #f0f0f0;

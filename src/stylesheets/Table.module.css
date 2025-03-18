@@ -1,6 +1,7 @@
 .table_container {
   overflow: hidden;
   overflow-x: auto;
+  margin: 20px 0;
 }
 
 .table {

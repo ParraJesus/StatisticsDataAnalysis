@@ -17,6 +17,7 @@ const Page = () => {
   });
   const [vif, setVif] = useState([]);
   const [dependentVarIndex, setDependentVarIndex] = useState(0);
+
   const [dependentVar, setDependentVar] = useState([]);
   const [independientVars, setIndependientVars] = useState([]);
   const [regressionData, setRegressionData] = useState({
@@ -115,43 +116,6 @@ const Page = () => {
     return [processedData, formattedString];
   };
 
-  /*
-    const calculateData = (datasets) => {
-    const covMat = calculateCovarianceMatrix(datasets);
-    const invCovMatrix = calculateMatrixInverse(covMat);
-    const covMatDiag = calculateDiagonal(covMat);
-    const covInvMatDiag = calculateDiagonal(invCovMatrix);
-    const diagonals = [];
-    diagonals.push(covMatDiag);
-    diagonals.push(covInvMatDiag);
-    const vif = calculateVIF(covMatDiag, covInvMatDiag);
-
-    let dependentVarAux = datasets[dependentVarIndex];
-    let independientVarsAux = datasets.filter(
-      (_, i) => i !== dependentVarIndex
-    );
-
-    let regressionDataAux = calculateLinearRegression(
-      independientVarsAux,
-      dependentVarAux
-    );
-    let regressionMetricsAux = calculateRegressionMetrics(
-      independientVarsAux,
-      dependentVarAux,
-      regressionDataAux.beta
-    );
-
-    setRegressionData(regressionDataAux);
-    setRegresionMetrics(regressionMetricsAux);
-    setDependentVar(dependentVarAux);
-    setIndependientVars(independientVarsAux);
-    setCovarianceMatrix(covMat);
-    setInverseCovarianceMatrix(invCovMatrix);
-    setMatrixDiagonals({ covMatDiag, covInvMatDiag });
-    setVif(vif);
-  };
-  */
-
   const calculateData = (datasets) => {
     const covMat = calculateCovarianceMatrix(datasets);
     const invCovMatrix = calculateMatrixInverse(covMat);
@@ -168,12 +132,12 @@ const Page = () => {
     let regressionMetricsAux = [];
     let regressionIterationAux = [];
     independientVarsAux = datasets.filter((_, i) => i !== dependentVarIndex);
-
-    let i = 0;
-    let x = [1, 1];
+    let independientVarsLabels = datasets
+      .map((_, i) => `X${i}`)
+      .filter((_, i) => i !== dependentVarIndex);
+    let x = [];
     let keepLooping = true;
     while (keepLooping) {
-      i++;
       regressionDataAux = calculateLinearRegression(
         independientVarsAux,
         dependentVarAux
@@ -186,34 +150,24 @@ const Page = () => {
       regressionIterationAux.push({
         regressionData: regressionDataAux,
         regressionMetrics: regressionMetricsAux,
+        independientVarsLabels: [...independientVarsLabels],
       });
-      let pValues = regressionDataAux.pValue.filter((_, i) => i !== 0);
-      let maxPValueIndex = pValues.indexOf(
-        Math.max(...regressionDataAux.pValue)
-      );
 
-      console.log("Variables independientes:", independientVarsAux);
-      console.log("regressionDataAux.pValue", regressionDataAux.pValue);
-      console.log("max index", maxPValueIndex);
+      let pValues = regressionDataAux.pValue.filter((_, i) => i !== 0);
+      let maxPValueIndex = pValues.indexOf(Math.max(...pValues));
+
+      independientVarsLabels = independientVarsLabels.filter(
+        (_, i) => i !== maxPValueIndex
+      );
       independientVarsAux = independientVarsAux.filter(
         (_, idx) => idx !== maxPValueIndex
       );
-      x = regressionDataAux.pValue.filter((p, i) => i !== 0 && p > 0.005);
+      x = regressionDataAux.pValue.filter((p, i) => i !== 0 && p > 0.05);
       if (x.length === 0 || maxPValueIndex === -1) {
         keepLooping = false;
       }
-      console.log("cantidad de datos no valiosos restantes", x);
-      console.log("\n");
-      console.log("\n");
-      console.log("\n");
     }
-
-    console.log(regressionIterationAux);
-
-    setRegressionData(regressionIterationAux.at(-1).regressionData);
-    setRegresionMetrics(regressionIterationAux.at(-1).regressionMetrics);
-    //setRegressionData(regressionDataAux);
-    //setRegresionMetrics(regressionMetricsAux);
+    setRegressionIterationData(regressionIterationAux);
     setDependentVar(dependentVarAux);
     setIndependientVars(independientVarsAux);
     setCovarianceMatrix(covMat);
@@ -390,13 +344,34 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        When a multi-dimensional dataset and the number of groups for both
-        variables are entered into the inputs, the data will be grouped by
-        intervals. Upon completion of the calculations, the following will be
-        returned:
+        <strong>Expected Input:</strong> <br />
+        Multiple numerical datasets in the form of arrays (e.g., [x1, x2, x3,
+        ..., xn], [y1, y2, y3, ..., yn], [z1, z2, z3, ..., zn], ...) or multiple
+        data columns, similar to MATLAB or Excel formatting.
+        <br />
+        <br />
+        <strong>Process: </strong> <br />
+        Using the provided datasets, the tool calculates the covariance matrix
+        between variables, followed by the inverse of the covariance matrix and
+        the Variance Inflation Factor (VIF) for each variable to detect
+        multicollinearity. A linear regression model is built for a selected
+        target variable. The model iteratively computes key regression
+        statistics — Estimate Coefficients, Standard Error, t-Statistic, and
+        p-Value — for the intercept and each variable. Additionally, it
+        generates a performance metrics table including Number of Observations,
+        Error Degrees of Freedom, Root Mean Squared Error, R-squared, Adjusted
+        R-squared, F-statistic vs. Constant Model, and p-value. In each
+        iteration, the variable with the highest p-value that exceeds 0.05 is
+        removed from the regression model. This process repeats until no
+        remaining variables have a p-value greater than 0.05. <br /> <br />
+        <strong>Expected Output:</strong>
       </p>
       <ul className={`${styles.ul}`}>
-        <li>Absolute Frecuencies Table</li>
+        <li>Covariance Matrix</li>
+        <li>Inverse Covariance Matrix</li>
+        <li>Matrices Diagonals</li>
+        <li>Variance Inflation Factor for each variable</li>
+        <li>Linear Regression Model</li>
       </ul>
       <hr />
       <form onSubmit={handleSubmit} className={`${formStyles.form}`}>
@@ -548,62 +523,84 @@ const Page = () => {
               ))}
             </select>
           </label>
-          <h2>Iteration 1</h2>
-          <div className={`${tableStyles.table_container}`}>
-            <table className={`${tableStyles.table}`}>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Estimate Coefficients</th>
-                  <th>Standard Error</th>
-                  <th>Statistic-T</th>
-                  <th>P-Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {["Intercept", ...independientVars.map((_, i) => `X${i}`)].map(
-                  (name, index) => (
-                    <tr key={index}>
-                      <td className={`${tableStyles.highlighted_row}`}>
-                        {name}
-                      </td>
-                      <td>{regressionData.beta[index].toFixed(6)}</td>
-                      <td>{regressionData.SE[index].toFixed(6)}</td>
-                      <td>{regressionData.tStat[index].toFixed(6)}</td>
-                      <td>{regressionData.pValue[index].toFixed(10)}</td>
+          {regressionIterationData.map((iteration, index) => (
+            <div key={index}>
+              <h2>Iteration {index + 1}</h2>
+              <div className={`${tableStyles.table_container}`}>
+                <table className={`${tableStyles.table}`}>
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Estimate Coefficients</th>
+                      <th>Standard Error</th>
+                      <th>Statistic-T</th>
+                      <th>P-Value</th>
                     </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className={`${tableStyles.table_container}`}>
-            <table className={`${tableStyles.table}`}>
-              <thead>
-                <tr>
-                  <th>Number of observations</th>
-                  <th>Error degrees of freedom</th>
-                  <th>Root Mean Squared Error</th>
-                  <th>R-squared</th>
-                  <th>Adjusted R-Squared</th>
-                  <th>F-statistic vs. constant model</th>
-                  <th>p-value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{regressionMetrics.numberOfObservations}</td>
-                  <td>{regressionMetrics.errorDegreesOfFreedom}</td>
-                  <td>{regressionMetrics.RMSE.toFixed(3)}</td>
-                  <td>{regressionMetrics.R_squared.toFixed(3)}</td>
-                  <td>{regressionMetrics.adjusted_R_squared.toFixed(3)}</td>
-                  <td>{regressionMetrics.F_statistic.toFixed(2)}</td>
-                  <td>{regressionMetrics.p_value.toFixed(10)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <hr />
+                  </thead>
+                  <tbody>
+                    {["Intercept", ...iteration.independientVarsLabels].map(
+                      (name, idx) => (
+                        <tr key={idx}>
+                          <td className={`${tableStyles.highlighted_row}`}>
+                            {name}
+                          </td>
+                          <td>
+                            {iteration.regressionData.beta[idx].toFixed(6)}
+                          </td>
+                          <td>{iteration.regressionData.SE[idx].toFixed(6)}</td>
+                          <td>
+                            {iteration.regressionData.tStat[idx].toFixed(6)}
+                          </td>
+                          <td>
+                            {iteration.regressionData.pValue[idx].toFixed(10)}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className={`${tableStyles.table_container}`}>
+                <table className={`${tableStyles.table}`}>
+                  <thead>
+                    <tr>
+                      <th>Number of observations</th>
+                      <th>Error degrees of freedom</th>
+                      <th>Root Mean Squared Error</th>
+                      <th>R-squared</th>
+                      <th>Adjusted R-Squared</th>
+                      <th>F-statistic vs. constant model</th>
+                      <th>p-value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        {iteration.regressionMetrics.numberOfObservations}
+                      </td>
+                      <td>
+                        {iteration.regressionMetrics.errorDegreesOfFreedom}
+                      </td>
+                      <td>{iteration.regressionMetrics.RMSE.toFixed(3)}</td>
+                      <td>
+                        {iteration.regressionMetrics.R_squared.toFixed(3)}
+                      </td>
+                      <td>
+                        {iteration.regressionMetrics.adjusted_R_squared.toFixed(
+                          3
+                        )}
+                      </td>
+                      <td>
+                        {iteration.regressionMetrics.F_statistic.toFixed(2)}
+                      </td>
+                      <td>{iteration.regressionMetrics.p_value.toFixed(10)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <hr />
+            </div>
+          ))}
         </>
       )}
     </div>

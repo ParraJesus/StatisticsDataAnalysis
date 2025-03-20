@@ -225,10 +225,24 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        When entering a data set into the input, the fields of a frequency table
-        will be dynamically calculated, grouping by the number of tuples
-        entered. Upon completion of the computations, the following will be
-        delivered:
+        <strong>Expected Input:</strong>
+      </p>
+      <ul className={`${styles.ul}`}>
+        <li>
+          A numerical dataset in the form of an array (e.g., [x1, x2, x3, x4,
+          x5, x6, x7, x8, ...]) or a data column, similar to MATLAB or Excel
+          formatting
+        </li>
+        <li>Number of classes to group the data into</li>
+      </ul>
+      <p>
+        <strong>Process:</strong>
+        <br />
+        Using the input data and the specified number of classes, the tool
+        constructs a frequency table. Class ranges based on the dataset's
+        minimum, maximum, and number of classes. Class marks, absolute
+        frequency, relative frequency, cumulative relative frequency
+        <br /> <br /> <strong>Expected Output:</strong>
       </p>
       <ul className={`${styles.ul}`}>
         <li>Classes</li>

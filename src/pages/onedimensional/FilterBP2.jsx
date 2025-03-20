@@ -162,10 +162,20 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        When a dataset is entered as input, this filter will calculate
-        iteratively percentiles 25, 50, 75, IQR, whiskers and outliers of a
-        boxplot chart. On every iteration the furthest outlier will be cut off.
-        The result will be the following information for each iteration:
+        <strong>Expected Input:</strong> <br />A numerical dataset in the form
+        of an array (e.g., [x1, x2, x3, x4, x5, x6, x7, x8, ...]) or a data
+        column, similar to MATLAB or Excel formatting. <br /> <br />
+        <strong>Process:</strong>
+        <br />
+        This tool iteratively calculates the key components of a boxplot, 25th
+        percentile (Q1), 50th percentile (Median), 75th percentile (Q3),
+        Interquartile Range (IQR), Lower Whisker, Upper Whisker, Outliers — any
+        data points falling below the lower whisker or above the upper whisker
+        are classified as outliers. In each iteration, only the most extreme
+        outlier — the one furthest from the whiskers — is removed. This process
+        repeats until no more outliers remain.
+        <br /> <br />
+        <strong>Expected Output:</strong>
       </p>
       <ul className={`${styles.ul}`}>
         <li>Mean</li>

@@ -12,7 +12,7 @@
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   color: var(--paragrahp_color);
-  background-color: #f1f1f1;
+  background-color: var(--gray);
   border: none;
   border-bottom: 2px solid var(--blue_2);
   resize: none;
@@ -28,7 +28,7 @@
 .option {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
-  background-color: #f0f0f0;
+  background-color: var(--gray);
   color: var(--paragrahp_color);
   border: none;
   border-bottom: 2px solid var(--blue_2);
@@ -36,6 +36,10 @@
   width: 100%;
   margin: 10px 0 20px 0;
   padding: 10px;
+}
+
+.option {
+  cursor: pointer;
 }
 
 .no_selectable {

@@ -84,10 +84,12 @@ const SideMenu = () => {
     >
       {!isExpanded && (
         <>
-          <div
-            title="Gabriel Parra"
-            className={`${styles.img_container}`}
-          ></div>
+          <div className={`${styles.sideMenu_logo_container}`}>
+            <div
+              title="Gabriel Parra"
+              className={`${styles.img_container}`}
+            ></div>
+          </div>
           {sideMenuData.map((menuItem, index) => (
             <SideMenuItem
               key={index}
@@ -107,9 +109,7 @@ const SideMenu = () => {
               title="Gabriel Parra"
             ></div>
             <p>
-              <strong>
-                Statistic Data <br /> Analysis
-              </strong>
+              <strong>Statistic Data Analysis</strong>
             </p>
           </div>
           {sideMenuData.map((menuItem, index) => (

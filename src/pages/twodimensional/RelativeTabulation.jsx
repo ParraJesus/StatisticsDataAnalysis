@@ -305,18 +305,33 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        When a two-dimensional dataset and the number of groups for both
-        variables are entered into the inputs, the data will be grouped by
-        intervals. Upon completion of the calculations, the following will be
-        returned:
+        <strong>Expected Input:</strong>
       </p>
       <ul className={`${styles.ul}`}>
-        <li>Absolute Frecuencies Table</li>
-        <li>Relative Frecuencies Table</li>
+        <li>
+          Two numerical datasets in the form of arrays (e.g., [x1, x2, x3, ...,
+          xn] and [y1, y2, y3, ..., yn]) or two data columns, similar to MATLAB
+          or Excel formatting
+        </li>
+        <li>Number of classes to group the first variable</li>
+        <li>Number of classes to group the second variable</li>
+      </ul>
+      <p>
+        <strong>Process: </strong> <br />
+        Using the provided data, the tool generates frequency tables for each
+        dataset, grouping the data into the specified number of classes. It
+        calculates both absolute and relative frequencies for each variable
+        based on their respective groupings, providing an overview of the data
+        distribution <br /> <br />
+        <strong>Expected Output:</strong>
+      </p>
+      <ul className={`${styles.ul}`}>
         <li>Means</li>
         <li>Medians</li>
         <li>Variances</li>
         <li>Standar Deviations</li>
+        <li>Absolute Frecuencies Table</li>
+        <li>Relative Frecuencies Table</li>
       </ul>
       <hr />
       <form onSubmit={handleSubmit} className={`${formStyles.form}`}>

@@ -544,23 +544,42 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        A quantity of raw data is taken as input, the number of classes by which
-        it is to be grouped and the quantity of desired data to be simulated.
-        From this data, a new quantity of items with the same statistical trend
-        will be delivered. Upon completion of the computations, the following
-        data will be obtained:
+        <strong>Expected Input:</strong>
+      </p>
+      <ul className={`${styles.ul}`}>
+        <li>
+          A numerical dataset in the form of an array (e.g., [x1, x2, x3, x4,
+          x5, x6, x7, x8, ...]) or a data column, similar to MATLAB or Excel
+          formatting
+        </li>
+        <li>Number of classes to group the data into</li>
+        <li>Number of synthetic data points to generate</li>
+        <li>A percentile value to compare against</li>
+      </ul>
+      <p>
+        <strong>Process:</strong> <br />
+        Using the input data, the tool generates a frequency table that includes
+        Classes, Class Marks, Absolute Frequencies, Cumulative Absolute
+        Frequencies, and Relative Frequencies. It then generates a synthetic
+        dataset that mimics the statistical behavior of the original data.
+        Additionally, a comparison table is created between the original data,
+        tabulated data, and synthetic data, including the following statistics:
+        Mean, Median, Variance, Standard Deviation, 10th Percentile, 25th
+        Percentile, 75th Percentile, 90th Percentile, and the user-defined
+        percentile. <br /> <br /> <strong>Expected Output:</strong>
       </p>
       <ul className={`${styles.ul}`}>
         <li>Classes</li>
-        <li>Class Marks</li>
-        <li>Absolute Frecuency</li>
-        <li>Cumulative Absolute Frecuency</li>
-        <li>Relative Frecuency</li>
-        <li>Cumulative Relative Frecuency</li>
-        <li>Raw Dataset Histogram</li>
-        <li>Synthetic Dataset Histogram</li>
-        <li>Raw Dataset Boxplot</li>
-        <li>Synthetic Dataset Boxplot</li>
+        <li>Class marks</li>
+        <li>Absolute frecuency</li>
+        <li>Cumulative absolute frecuency</li>
+        <li>Relative frecuency</li>
+        <li>Cumulative relative frecuency</li>
+        <li>Raw dataset histogram</li>
+        <li>Synthetic dataset histogram</li>
+        <li>Raw dataset boxplot</li>
+        <li>Synthetic dataset boxplot</li>
+        <li>Synthetic dataset amount and list</li>
       </ul>
       <hr />
       <form onSubmit={handleSubmit} className={`${formStyles.form}`}>
@@ -642,7 +661,7 @@ const Page = () => {
                   <th>Absolute Frecuencies</th>
                   <th>Cumulative Absolute Frecuencies</th>
                   <th>Relative Frecuencies</th>
-                  <th>Relative Frecuencies</th>
+                  <th>Cumulative Relative Frecuencies</th>
                 </tr>
               </thead>
               <tbody>

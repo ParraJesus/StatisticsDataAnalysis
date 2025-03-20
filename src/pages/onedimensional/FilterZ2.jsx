@@ -127,19 +127,26 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        When a dataset is entered as input, the standard deviation will be
-        iteratively calculated, the data will be zeta-scaled, and the data point
-        furthest from the mean—the one with the greatest number of standard
-        deviations—will be cut off. The result will be the following information
-        for each iteration:
+        <strong>Expected Input:</strong> <br />A numerical dataset in the form
+        of an array (e.g., [x1, x2, x3, x4, x5, x6, x7, x8, ...]) or a data
+        column, similar to MATLAB or Excel formatting. <br /> <br />
+        <strong>Process:</strong>
+        <br />
+        The tool calculates the dataset's standard deviation and computes the
+        z-score for each value. It identifies and removes only the data point
+        with the largest absolute z-score (|z-score|) greater than or equal to
+        3. This process repeats iteratively, recalculating after each removal,
+        until no more extreme outliers remain.
+        <br /> <br />
+        <strong>Expected Output:</strong>
       </p>
       <ul className={`${styles.ul}`}>
         <li>Mean</li>
         <li>Median</li>
-        <li>Standar Deviation</li>
-        <li>Removed Item</li>
-        <li>Remaining Items List</li>
-        <li>Histogram</li>
+        <li>Standar deviation</li>
+        <li>List of removed items (outliers)</li>
+        <li>Count of remaining items and the final cleaned dataset</li>
+        <li>Histograms showing the data distribution for each iteration</li>
       </ul>
       <hr />
       <form onSubmit={handleSubmit} className={`${formStyles.form}`}>

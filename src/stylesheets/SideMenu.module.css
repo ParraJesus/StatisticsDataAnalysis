@@ -37,10 +37,12 @@
 }
 
 .sideMenu_logo_container {
+  margin-top: 5px;
   display: flex;
   justify-content: center;
-  align-items: start;
+  align-items: center;
   overflow: hidden;
+  text-align: center;
 }
 
 .sideMenu_logo_container p {
@@ -48,14 +50,13 @@
 }
 
 .img_container {
-  height: 28px;
-  width: 28px;
+  height: 38px;
+  width: 38px;
   background-color: #fff;
   background-image: url("https://cdna.artstation.com/p/assets/images/images/075/917/646/large/gabriel-parra-4.jpg?1715737858");
   background-position: center;
   background-size: cover;
   border-radius: 100%;
-  margin: 10px 0 0 0;
 }
 
 .sideMenu_item_container {
@@ -94,7 +95,6 @@
 }
 
 .list_icon {
-  color: aliceblue;
   fill: var(--white);
   height: 24px;
   width: 24px;

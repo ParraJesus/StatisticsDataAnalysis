@@ -148,20 +148,28 @@ const Page = () => {
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
       <p>
-        When a dataset is entered as input, this filter will calculate
-        iteratively percentiles 25, 50, 75, IQR, whiskers and outliers of a
-        boxplot chart. On every iteration the outliers will be cut off. The
-        result will be the following information for each iteration:
+        <strong>Expected Input:</strong> <br />A numerical dataset in the form
+        of an array (e.g., [x1, x2, x3, x4, x5, x6, x7, x8, ...]) or a data
+        column, similar to MATLAB or Excel formatting. <br /> <br />
+        <strong>Process:</strong>
+        <br />
+        This tool iteratively calculates the key components of a boxplot, 25th
+        percentile (Q1), 50th percentile (Median), 75th percentile (Q3),
+        Interquartile Range (IQR), Lower Whisker, Upper Whisker, Outliers — any
+        data points falling below the lower whisker or above the upper whisker
+        are classified as outliers.
+        <br /> <br />
+        <strong>Expected Output:</strong>
       </p>
       <ul className={`${styles.ul}`}>
         <li>Mean</li>
         <li>Median</li>
-        <li>Standar Deviation</li>
-        <li>Lower Whisker</li>
-        <li>Upper Whisker</li>
-        <li>Outliers List</li>
-        <li>Remaining Items List</li>
-        <li>Boxplot</li>
+        <li>Standar deviation</li>
+        <li>Lower whisker</li>
+        <li>Upper whisker</li>
+        <li>Outliers list</li>
+        <li>Remaining items list</li>
+        <li>Boxplot Visualization For Each Iteration</li>
       </ul>
       <hr />
       <form onSubmit={handleSubmit} className={`${formStyles.form}`}>

@@ -34,6 +34,10 @@ const Page = () => {
     F_statistic: [],
     p_value: [],
   });
+  const [regressionIterationData, setRegressionIterationData] = useState({
+    regressionData: [],
+    regressionMetrics: [],
+  });
 
   const [toggleContent, setToggleContent] = useState(false);
   const [hasDataInputUpdated, setHasDataInputUpdated] = useState(false);
@@ -111,7 +115,43 @@ const Page = () => {
     return [processedData, formattedString];
   };
 
-  //calculations
+  /*
+    const calculateData = (datasets) => {
+    const covMat = calculateCovarianceMatrix(datasets);
+    const invCovMatrix = calculateMatrixInverse(covMat);
+    const covMatDiag = calculateDiagonal(covMat);
+    const covInvMatDiag = calculateDiagonal(invCovMatrix);
+    const diagonals = [];
+    diagonals.push(covMatDiag);
+    diagonals.push(covInvMatDiag);
+    const vif = calculateVIF(covMatDiag, covInvMatDiag);
+
+    let dependentVarAux = datasets[dependentVarIndex];
+    let independientVarsAux = datasets.filter(
+      (_, i) => i !== dependentVarIndex
+    );
+
+    let regressionDataAux = calculateLinearRegression(
+      independientVarsAux,
+      dependentVarAux
+    );
+    let regressionMetricsAux = calculateRegressionMetrics(
+      independientVarsAux,
+      dependentVarAux,
+      regressionDataAux.beta
+    );
+
+    setRegressionData(regressionDataAux);
+    setRegresionMetrics(regressionMetricsAux);
+    setDependentVar(dependentVarAux);
+    setIndependientVars(independientVarsAux);
+    setCovarianceMatrix(covMat);
+    setInverseCovarianceMatrix(invCovMatrix);
+    setMatrixDiagonals({ covMatDiag, covInvMatDiag });
+    setVif(vif);
+  };
+  */
+
   const calculateData = (datasets) => {
     const covMat = calculateCovarianceMatrix(datasets);
     const invCovMatrix = calculateMatrixInverse(covMat);
@@ -121,29 +161,64 @@ const Page = () => {
     diagonals.push(covMatDiag);
     diagonals.push(covInvMatDiag);
     const vif = calculateVIF(covMatDiag, covInvMatDiag);
-    const dependientVarAux = datasets[dependentVarIndex];
-    const independientVarsAux = datasets.filter(
-      (_, i) => i !== dependentVarIndex
-    );
-    const regressionDataAux = calculateLinearRegression(
-      independientVarsAux,
-      dependientVarAux
-    );
-    const regressionMetricsAux = calculateRegressionMetrics(
-      independientVarsAux,
-      dependientVarAux,
-      regressionDataAux.beta
-    );
-    setRegressionData(regressionDataAux);
-    setRegresionMetrics(regressionMetricsAux);
-    setDependentVar(dependientVarAux);
+
+    let dependentVarAux = datasets[dependentVarIndex];
+    let independientVarsAux = [];
+    let regressionDataAux = [];
+    let regressionMetricsAux = [];
+    let regressionIterationAux = [];
+    independientVarsAux = datasets.filter((_, i) => i !== dependentVarIndex);
+
+    let i = 0;
+    let x = [1, 1];
+    let keepLooping = true;
+    while (keepLooping) {
+      i++;
+      regressionDataAux = calculateLinearRegression(
+        independientVarsAux,
+        dependentVarAux
+      );
+      regressionMetricsAux = calculateRegressionMetrics(
+        independientVarsAux,
+        dependentVarAux,
+        regressionDataAux.beta
+      );
+      regressionIterationAux.push({
+        regressionData: regressionDataAux,
+        regressionMetrics: regressionMetricsAux,
+      });
+      let pValues = regressionDataAux.pValue.filter((_, i) => i !== 0);
+      let maxPValueIndex = pValues.indexOf(
+        Math.max(...regressionDataAux.pValue)
+      );
+
+      console.log("Variables independientes:", independientVarsAux);
+      console.log("regressionDataAux.pValue", regressionDataAux.pValue);
+      console.log("max index", maxPValueIndex);
+      independientVarsAux = independientVarsAux.filter(
+        (_, idx) => idx !== maxPValueIndex
+      );
+      x = regressionDataAux.pValue.filter((p, i) => i !== 0 && p > 0.005);
+      if (x.length === 0 || maxPValueIndex === -1) {
+        keepLooping = false;
+      }
+      console.log("cantidad de datos no valiosos restantes", x);
+      console.log("\n");
+      console.log("\n");
+      console.log("\n");
+    }
+
+    console.log(regressionIterationAux);
+
+    setRegressionData(regressionIterationAux.at(-1).regressionData);
+    setRegresionMetrics(regressionIterationAux.at(-1).regressionMetrics);
+    //setRegressionData(regressionDataAux);
+    //setRegresionMetrics(regressionMetricsAux);
+    setDependentVar(dependentVarAux);
     setIndependientVars(independientVarsAux);
     setCovarianceMatrix(covMat);
     setInverseCovarianceMatrix(invCovMatrix);
-    setMatrixDiagonals({
-      covMatDiag,
-      covInvMatDiag,
-    });
+    setMatrixDiagonals({ covMatDiag, covInvMatDiag });
     setVif(vif);
   };
 
@@ -473,6 +548,7 @@ const Page = () => {
               ))}
             </select>
           </label>
+          <h2>Iteration 1</h2>
           <div className={`${tableStyles.table_container}`}>
             <table className={`${tableStyles.table}`}>
               <thead>
@@ -494,7 +570,7 @@ const Page = () => {
                       <td>{regressionData.beta[index].toFixed(6)}</td>
                       <td>{regressionData.SE[index].toFixed(6)}</td>
                       <td>{regressionData.tStat[index].toFixed(6)}</td>
-                      <td>{regressionData.pValue[index].toFixed(6)}</td>
+                      <td>{regressionData.pValue[index].toFixed(10)}</td>
                     </tr>
                   )
                 )}
@@ -522,7 +598,7 @@ const Page = () => {
                   <td>{regressionMetrics.R_squared.toFixed(3)}</td>
                   <td>{regressionMetrics.adjusted_R_squared.toFixed(3)}</td>
                   <td>{regressionMetrics.F_statistic.toFixed(2)}</td>
-                  <td>{regressionMetrics.p_value.toFixed(6)}</td>
+                  <td>{regressionMetrics.p_value.toFixed(10)}</td>
                 </tr>
               </tbody>
             </table>

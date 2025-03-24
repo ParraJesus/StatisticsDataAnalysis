@@ -5,6 +5,7 @@ import { jStat } from "jstat";
 import styles from "../../stylesheets/Layout.module.css";
 import formStyles from "../../stylesheets/Form.module.css";
 import tableStyles from "../../stylesheets/Table.module.css";
+import CollapsibleSection from "../../components/CollapsibleSection";
 
 const Page = () => {
   const [rawDataSet, setRawDataSet] = useState([]);
@@ -18,9 +19,9 @@ const Page = () => {
   const [vif, setVif] = useState([]);
   const [dependentVarIndex, setDependentVarIndex] = useState(0);
 
-  const [dependentVar, setDependentVar] = useState([]);
-  const [independientVars, setIndependientVars] = useState([]);
-  const [regressionData, setRegressionData] = useState({
+  //const [dependentVar, setDependentVar] = useState([]);
+  //const [independientVars, setIndependientVars] = useState([]);
+  /*const [regressionData, setRegressionData] = useState({
     beta: [],
     SE: [],
     tStat: [],
@@ -35,6 +36,7 @@ const Page = () => {
     F_statistic: [],
     p_value: [],
   });
+  */
   const [regressionIterationData, setRegressionIterationData] = useState({
     regressionData: [],
     regressionMetrics: [],
@@ -42,10 +44,12 @@ const Page = () => {
 
   const [toggleContent, setToggleContent] = useState(false);
   const [hasDataInputUpdated, setHasDataInputUpdated] = useState(false);
+  //const [showAll, setShowAll] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setHasDataInputUpdated(false);
+    setDependentVarIndex(0);
 
     const [processedData, formattedData] = parseFlexibleDataSets(
       rawDataSet.length > 0 ? rawDataSet : [[0], [0], [0], [0]]
@@ -116,8 +120,11 @@ const Page = () => {
     return [processedData, formattedString];
   };
 
-  const calculateData = (datasets) => {
-    const covMat = calculateCovarianceMatrix(datasets);
+  const calculateData = (datasets, dependentVarIndex = 0) => {
+    const [processedData, formattedData] = parseFlexibleDataSets(
+      datasets.length > 0 ? datasets : [[0], [0], [0], [0]]
+    );
+    const covMat = calculateCovarianceMatrix(processedData);
     const invCovMatrix = calculateMatrixInverse(covMat);
     const covMatDiag = calculateDiagonal(covMat);
     const covInvMatDiag = calculateDiagonal(invCovMatrix);
@@ -163,13 +170,16 @@ const Page = () => {
         (_, idx) => idx !== maxPValueIndex
       );
       x = regressionDataAux.pValue.filter((p, i) => i !== 0 && p > 0.05);
+      if (regressionMetricsAux.p_value > 0.05) {
+        keepLooping = false;
+      }
       if (x.length === 0 || maxPValueIndex === -1) {
         keepLooping = false;
       }
     }
     setRegressionIterationData(regressionIterationAux);
-    setDependentVar(dependentVarAux);
-    setIndependientVars(independientVarsAux);
+    //setDependentVar(dependentVarAux);
+    //setIndependientVars(independientVarsAux);
     setCovarianceMatrix(covMat);
     setInverseCovarianceMatrix(invCovMatrix);
     setMatrixDiagonals({ covMatDiag, covInvMatDiag });
@@ -402,83 +412,86 @@ const Page = () => {
       {toggleContent && (
         <>
           <hr />
-          <h2>Covariance Matrix</h2>
-          <div className={`${tableStyles.table_container}`}>
-            <table className={`${tableStyles.table}`}>
-              <thead>
-                <tr>
-                  <th></th>
-                  {covarianceMatrix.map((_, index) => (
-                    <th key={index}>{`X${index}`}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {covarianceMatrix.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    <td
-                      className={`${tableStyles.highlighted_row}`}
-                    >{`X${rowIndex}`}</td>
-                    {row.map((value, colIndex) => (
-                      <td key={colIndex}>{value}</td>
+          <CollapsibleSection
+            HiddenMessage="Show Covariance Matrices"
+            ShownMessage="Hide Covariance Matrices"
+          >
+            <h2>Covariance Matrix</h2>
+            <div className={`${tableStyles.table_container}`}>
+              <table className={`${tableStyles.table}`}>
+                <thead>
+                  <tr>
+                    <th></th>
+                    {covarianceMatrix.map((_, index) => (
+                      <th key={index}>{`X${index}`}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <hr />
-          <h2>Inverse Covariance Matrix</h2>
-          <div className={`${tableStyles.table_container}`}>
-            <table className={`${tableStyles.table}`}>
-              <thead>
-                <tr>
-                  <th></th>
-                  {inverseCovarianceMatrix.map((_, index) => (
-                    <th key={index}>{`X${index}`}</th>
+                </thead>
+                <tbody>
+                  {covarianceMatrix.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      <td
+                        className={`${tableStyles.highlighted_row}`}
+                      >{`X${rowIndex}`}</td>
+                      {row.map((value, colIndex) => (
+                        <td key={colIndex}>{value}</td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {inverseCovarianceMatrix.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    <td
-                      className={`${tableStyles.highlighted_row}`}
-                    >{`X${rowIndex}`}</td>
-                    {row.map((value, colIndex) => (
-                      <td key={colIndex}>{value.toFixed(4)}</td>
+                </tbody>
+              </table>
+            </div>
+            <h2>Inverse Covariance Matrix</h2>
+            <div className={`${tableStyles.table_container}`}>
+              <table className={`${tableStyles.table}`}>
+                <thead>
+                  <tr>
+                    <th></th>
+                    {inverseCovarianceMatrix.map((_, index) => (
+                      <th key={index}>{`X${index}`}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <hr />
-          <h2>Matrices Diagonals</h2>
-          <div className={`${tableStyles.table_container}`}>
-            <table className={`${tableStyles.table}`}>
-              <thead>
-                <tr>
-                  <th>Matrix</th>
-                  <th>Diagonal</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>Covariance</strong>
-                  </td>
-                  <td>{`[${matrixDiagonals.covMatDiag}]`}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Inverse Covariance</strong>
-                  </td>
-                  <td>{`[${matrixDiagonals.covInvMatDiag}]`}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {inverseCovarianceMatrix.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      <td
+                        className={`${tableStyles.highlighted_row}`}
+                      >{`X${rowIndex}`}</td>
+                      {row.map((value, colIndex) => (
+                        <td key={colIndex}>{value.toFixed(4)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <h2>Matrices Diagonals</h2>
+            <div className={`${tableStyles.table_container}`}>
+              <table className={`${tableStyles.table}`}>
+                <thead>
+                  <tr>
+                    <th>Matrix</th>
+                    <th>Diagonal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>Covariance</strong>
+                    </td>
+                    <td>{`[${matrixDiagonals.covMatDiag}]`}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Inverse Covariance</strong>
+                    </td>
+                    <td>{`[${matrixDiagonals.covInvMatDiag}]`}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </CollapsibleSection>
           <hr />
           <h2>Variance Inflation Factor</h2>
           <div className={`${tableStyles.table_container}`}>
@@ -515,7 +528,7 @@ const Page = () => {
               value={dependentVarIndex}
               onChange={(e) => {
                 setDependentVarIndex(parseInt(e.target.value));
-                setHasDataInputUpdated(true);
+                calculateData(rawDataSet, parseInt(e.target.value));
               }}
             >
               {vif.map((_, index) => (
@@ -523,7 +536,241 @@ const Page = () => {
               ))}
             </select>
           </label>
-          {regressionIterationData.map((iteration, index) => (
+          {regressionIterationData.length > 0 && (
+            <div key={regressionIterationData.length - 1}>
+              <h2>Iteration {regressionIterationData.length}</h2>
+              {(() => {
+                const lastIteration =
+                  regressionIterationData[regressionIterationData.length - 1];
+                return (
+                  <>
+                    <div className={`${tableStyles.table_container}`}>
+                      <table className={`${tableStyles.table}`}>
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Estimate Coefficients</th>
+                            <th>Standard Error</th>
+                            <th>Statistic-T</th>
+                            <th>P-Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            "Intercept",
+                            ...lastIteration.independientVarsLabels,
+                          ].map((name, idx) => (
+                            <tr key={idx}>
+                              <td className={`${tableStyles.highlighted_row}`}>
+                                {name}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.beta[idx].toFixed(
+                                  6
+                                )}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.SE[idx].toFixed(
+                                  6
+                                )}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.tStat[
+                                  idx
+                                ].toFixed(6)}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.pValue[idx]
+                                  .toString()
+                                  .includes("e")
+                                  ? lastIteration.regressionData.pValue[
+                                      idx
+                                    ].toExponential(2)
+                                  : lastIteration.regressionData.pValue[
+                                      idx
+                                    ].toFixed(10)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className={`${tableStyles.table_container}`}>
+                      <table className={`${tableStyles.table}`}>
+                        <thead>
+                          <tr>
+                            <th>Number of observations</th>
+                            <th>Error degrees of freedom</th>
+                            <th>Root Mean Squared Error</th>
+                            <th>R-squared</th>
+                            <th>Adjusted R-Squared</th>
+                            <th>F-statistic vs. constant model</th>
+                            <th>p-value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>
+                              {
+                                lastIteration.regressionMetrics
+                                  .numberOfObservations
+                              }
+                            </td>
+                            <td>
+                              {
+                                lastIteration.regressionMetrics
+                                  .errorDegreesOfFreedom
+                              }
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.RMSE.toFixed(3)}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.R_squared.toFixed(
+                                3
+                              )}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.adjusted_R_squared.toFixed(
+                                3
+                              )}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.F_statistic.toFixed(
+                                2
+                              )}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.p_value
+                                .toString()
+                                .includes("e")
+                                ? lastIteration.regressionMetrics.p_value.toExponential(
+                                    2
+                                  )
+                                : lastIteration.regressionMetrics.p_value.toFixed(
+                                    10
+                                  )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+          <hr />
+          <CollapsibleSection
+            ShownMessage="Hide Steps"
+            HiddenMessage="Show Steps"
+          >
+            {regressionIterationData.map((iteration, index) => (
+              <div key={index}>
+                <h2>Iteration {index + 1}</h2>
+                <div className={`${tableStyles.table_container}`}>
+                  <table className={`${tableStyles.table}`}>
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Estimate Coefficients</th>
+                        <th>Standard Error</th>
+                        <th>Statistic-T</th>
+                        <th>P-Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {["Intercept", ...iteration.independientVarsLabels].map(
+                        (name, idx) => (
+                          <tr key={idx}>
+                            <td className={`${tableStyles.highlighted_row}`}>
+                              {name}
+                            </td>
+                            <td>
+                              {iteration.regressionData.beta[idx].toFixed(6)}
+                            </td>
+                            <td>
+                              {iteration.regressionData.SE[idx].toFixed(6)}
+                            </td>
+                            <td>
+                              {iteration.regressionData.tStat[idx].toFixed(6)}
+                            </td>
+                            <td>
+                              {iteration.regressionData.pValue[idx]
+                                .toString()
+                                .includes("e")
+                                ? iteration.regressionData.pValue[
+                                    idx
+                                  ].toExponential(2)
+                                : iteration.regressionData.pValue[idx].toFixed(
+                                    10
+                                  )}
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className={`${tableStyles.table_container}`}>
+                  <table className={`${tableStyles.table}`}>
+                    <thead>
+                      <tr>
+                        <th>Number of observations</th>
+                        <th>Error degrees of freedom</th>
+                        <th>Root Mean Squared Error</th>
+                        <th>R-squared</th>
+                        <th>Adjusted R-Squared</th>
+                        <th>F-statistic vs. constant model</th>
+                        <th>p-value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          {iteration.regressionMetrics.numberOfObservations}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.errorDegreesOfFreedom}
+                        </td>
+                        <td>{iteration.regressionMetrics.RMSE.toFixed(3)}</td>
+                        <td>
+                          {iteration.regressionMetrics.R_squared.toFixed(3)}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.adjusted_R_squared.toFixed(
+                            3
+                          )}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.F_statistic.toFixed(2)}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.p_value
+                            .toString()
+                            .includes("e")
+                            ? iteration.regressionMetrics.p_value.toExponential(
+                                2
+                              )
+                            : iteration.regressionMetrics.p_value.toFixed(10)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </CollapsibleSection>
+          <hr />
+        </>
+      )}
+    </div>
+  );
+};
+
+/*
+
+  {regressionIterationData.map((iteration, index) => (
             <div key={index}>
               <h2>Iteration {index + 1}</h2>
               <div className={`${tableStyles.table_container}`}>
@@ -552,7 +799,15 @@ const Page = () => {
                             {iteration.regressionData.tStat[idx].toFixed(6)}
                           </td>
                           <td>
-                            {iteration.regressionData.pValue[idx].toFixed(10)}
+                            {iteration.regressionData.pValue[idx]
+                              .toString()
+                              .includes("e")
+                              ? iteration.regressionData.pValue[
+                                  idx
+                                ].toExponential(2)
+                              : iteration.regressionData.pValue[idx].toFixed(
+                                  10
+                                )}
                           </td>
                         </tr>
                       )
@@ -593,7 +848,13 @@ const Page = () => {
                       <td>
                         {iteration.regressionMetrics.F_statistic.toFixed(2)}
                       </td>
-                      <td>{iteration.regressionMetrics.p_value.toFixed(10)}</td>
+                      <td>
+                        {iteration.regressionMetrics.p_value
+                          .toString()
+                          .includes("e")
+                          ? iteration.regressionMetrics.p_value.toExponential(2)
+                          : iteration.regressionMetrics.p_value.toFixed(10)}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -601,10 +862,7 @@ const Page = () => {
               <hr />
             </div>
           ))}
-        </>
-      )}
-    </div>
-  );
-};
+
+*/
 
 export default Page;

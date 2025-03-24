@@ -1,0 +1,14 @@
+.control_section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content_section {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.open {
+  min-height: auto;
+}

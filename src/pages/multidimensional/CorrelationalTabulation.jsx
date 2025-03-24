@@ -181,7 +181,6 @@ const Page = () => {
     let adjustedRSquared = 0;
     const minPer = minFinalPercentage / 100;
     let fittingRegressionAux = [];
-
     while (
       removedFitting.length < maxRemovals &&
       rSquared <= minPer &&
@@ -216,12 +215,13 @@ const Page = () => {
         fittingDependent = fittingDependent.filter(
           (_, idx) => idx !== maxErrorIndex
         );
-        removedFitting.push(Math.max(...error));
+        removedFitting.push(maxErrorIndex);
       }
       rSquared = regressionMetricsAux.R_squared;
       adjustedRSquared = regressionMetricsAux.adjusted_R_squared;
     }
 
+    //console.log(fittingIterationData);
     setFittingIterationData(fittingRegressionAux);
     setRegressionIterationData(regressionIterationAux);
     setCovarianceMatrix(covMat);
@@ -449,6 +449,7 @@ const Page = () => {
         <li>Matrices Diagonals</li>
         <li>Variance Inflation Factor for each variable</li>
         <li>Linear Regression Model</li>
+        <li>Fitted Linear Regression Model</li>
       </ul>
       <hr />
       <form onSubmit={handleSubmit} className={`${formStyles.form}`}>

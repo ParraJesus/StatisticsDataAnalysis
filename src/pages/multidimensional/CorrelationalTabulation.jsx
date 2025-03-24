@@ -9,7 +9,9 @@ import CollapsibleSection from "../../components/CollapsibleSection";
 
 const Page = () => {
   const [rawDataSet, setRawDataSet] = useState([]);
+  const [minFinalPercentage, setMinFinalPercentage] = useState(90);
   const [inputString, setInputString] = useState("");
+
   const [covarianceMatrix, setCovarianceMatrix] = useState([]);
   const [inverseCovarianceMatrix, setInverseCovarianceMatrix] = useState([]);
   const [matrixDiagonals, setMatrixDiagonals] = useState({
@@ -18,33 +20,19 @@ const Page = () => {
   });
   const [vif, setVif] = useState([]);
   const [dependentVarIndex, setDependentVarIndex] = useState(0);
-
-  //const [dependentVar, setDependentVar] = useState([]);
-  //const [independientVars, setIndependientVars] = useState([]);
-  /*const [regressionData, setRegressionData] = useState({
-    beta: [],
-    SE: [],
-    tStat: [],
-    pValue: [],
-  });
-  const [regressionMetrics, setRegresionMetrics] = useState({
-    numberOfObservations: [],
-    errorDegreesOfFreedom: [],
-    RMSE: [],
-    R_squared: [],
-    adjusted_R_squared: [],
-    F_statistic: [],
-    p_value: [],
-  });
-  */
   const [regressionIterationData, setRegressionIterationData] = useState({
     regressionData: [],
     regressionMetrics: [],
   });
+  const [fittingIterationData, setFittingIterationData] = useState({
+    regressionData: [],
+    regressionMetrics: [],
+    independientVarsLabels: [],
+    removed: [],
+  });
 
   const [toggleContent, setToggleContent] = useState(false);
   const [hasDataInputUpdated, setHasDataInputUpdated] = useState(false);
-  //const [showAll, setShowAll] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -144,6 +132,8 @@ const Page = () => {
       .filter((_, i) => i !== dependentVarIndex);
     let x = [];
     let keepLooping = true;
+    let finalIdependentVars = [];
+    let fittingLabels = [];
     while (keepLooping) {
       regressionDataAux = calculateLinearRegression(
         independientVarsAux,
@@ -163,6 +153,8 @@ const Page = () => {
       let pValues = regressionDataAux.pValue.filter((_, i) => i !== 0);
       let maxPValueIndex = pValues.indexOf(Math.max(...pValues));
 
+      finalIdependentVars = [...independientVarsAux];
+      fittingLabels = [...independientVarsLabels];
       independientVarsLabels = independientVarsLabels.filter(
         (_, i) => i !== maxPValueIndex
       );
@@ -170,16 +162,68 @@ const Page = () => {
         (_, idx) => idx !== maxPValueIndex
       );
       x = regressionDataAux.pValue.filter((p, i) => i !== 0 && p > 0.05);
+
       if (regressionMetricsAux.p_value > 0.05) {
         keepLooping = false;
+        break;
       }
+
       if (x.length === 0 || maxPValueIndex === -1) {
         keepLooping = false;
+        break;
       }
     }
+
+    let fittingDependent = [...dependentVarAux];
+    const maxRemovals = Math.floor(fittingDependent.length * 0.1);
+    let removedFitting = [];
+    let rSquared = 0;
+    let adjustedRSquared = 0;
+    const minPer = minFinalPercentage / 100;
+    let fittingRegressionAux = [];
+
+    while (
+      removedFitting.length < maxRemovals &&
+      rSquared <= minPer &&
+      adjustedRSquared <= minPer
+    ) {
+      const regressionDataAux = calculateLinearRegression(
+        finalIdependentVars,
+        fittingDependent
+      );
+
+      const regressionMetricsAux = calculateRegressionMetrics(
+        finalIdependentVars,
+        fittingDependent,
+        regressionDataAux.beta
+      );
+
+      fittingRegressionAux.push({
+        regressionData: regressionDataAux,
+        regressionMetrics: regressionMetricsAux,
+        independientVarsLabels: [...fittingLabels],
+        removed: [...removedFitting],
+      });
+
+      const yhat = calculateYhat(finalIdependentVars, regressionDataAux.beta);
+      const error = calculateYError(fittingDependent, yhat);
+      const maxErrorIndex = error.indexOf(Math.max(...error));
+
+      if (maxErrorIndex !== -1) {
+        finalIdependentVars = finalIdependentVars.map((col) =>
+          col.filter((_, idx) => idx !== maxErrorIndex)
+        );
+        fittingDependent = fittingDependent.filter(
+          (_, idx) => idx !== maxErrorIndex
+        );
+        removedFitting.push(Math.max(...error));
+      }
+      rSquared = regressionMetricsAux.R_squared;
+      adjustedRSquared = regressionMetricsAux.adjusted_R_squared;
+    }
+
+    setFittingIterationData(fittingRegressionAux);
     setRegressionIterationData(regressionIterationAux);
-    //setDependentVar(dependentVarAux);
-    //setIndependientVars(independientVarsAux);
     setCovarianceMatrix(covMat);
     setInverseCovarianceMatrix(invCovMatrix);
     setMatrixDiagonals({ covMatDiag, covInvMatDiag });
@@ -350,6 +394,29 @@ const Page = () => {
     };
   };
 
+  const calculateYhat = (independentVars, beta) => {
+    const n = independentVars[0].length;
+
+    let X = Array.from({ length: n }, (_, i) => [
+      1,
+      ...independentVars.map((col) => col[i]),
+    ]);
+
+    const yhat = X.map((row) =>
+      row.reduce((sum, value, index) => sum + value * beta[index], 0)
+    );
+
+    return yhat;
+  };
+
+  const calculateYError = (y, yhat) => {
+    if (y.length !== yhat.length) {
+      throw new Error("Las longitudes de 'y' y 'yhat' deben ser iguales.");
+    }
+
+    return y.map((val, i) => Math.abs(val - yhat[i]));
+  };
+
   return (
     <div className={`${styles.content}`}>
       <h2 className={`${styles.h2}`}>What is it about?</h2>
@@ -399,6 +466,24 @@ const Page = () => {
               setInputString(e.target.value);
             }}
           ></textarea>
+        </label>
+        <label htmlFor="minFinalPercentage" className={`${formStyles.label}`}>
+          {
+            "minimum acceptable percentage for the reconstruction of the dependent variable "
+          }
+          <input
+            className={`${formStyles.input}`}
+            type="number"
+            name="minFinalPercentage"
+            id="minFinalPercentage"
+            placeholder="..."
+            defaultValue={90}
+            max={100}
+            onChange={(e) => {
+              setHasDataInputUpdated(true);
+              setMinFinalPercentage(parseInt(e.target.value));
+            }}
+          />
         </label>
         <button
           type="submit"
@@ -662,8 +747,8 @@ const Page = () => {
           )}
           <hr />
           <CollapsibleSection
-            ShownMessage="Hide Steps"
-            HiddenMessage="Show Steps"
+            ShownMessage="Hide Linear Regresion Steps"
+            HiddenMessage="Show Linear Regresion Steps"
           >
             {regressionIterationData.map((iteration, index) => (
               <div key={index}>
@@ -762,107 +847,246 @@ const Page = () => {
             ))}
           </CollapsibleSection>
           <hr />
+          <h2>Fitting Linear Regression Model</h2>
+          {fittingIterationData.length > 0 && (
+            <div>
+              {(() => {
+                const lastIteration =
+                  fittingIterationData[fittingIterationData.length - 1];
+                return (
+                  <>
+                    <div className={`${tableStyles.table_container}`}>
+                      <table className={`${tableStyles.table}`}>
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Estimate Coefficients</th>
+                            <th>Standard Error</th>
+                            <th>Statistic-T</th>
+                            <th>P-Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            "Intercept",
+                            ...lastIteration.independientVarsLabels,
+                          ].map((name, idx) => (
+                            <tr key={idx}>
+                              <td className={`${tableStyles.highlighted_row}`}>
+                                {name}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.beta[idx].toFixed(
+                                  6
+                                )}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.SE[idx].toFixed(
+                                  6
+                                )}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.tStat[
+                                  idx
+                                ].toFixed(6)}
+                              </td>
+                              <td>
+                                {lastIteration.regressionData.pValue[idx]
+                                  .toString()
+                                  .includes("e")
+                                  ? lastIteration.regressionData.pValue[
+                                      idx
+                                    ].toExponential(2)
+                                  : lastIteration.regressionData.pValue[
+                                      idx
+                                    ].toFixed(10)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className={`${tableStyles.table_container}`}>
+                      <table className={`${tableStyles.table}`}>
+                        <thead>
+                          <tr>
+                            <th>Number of observations</th>
+                            <th>Error degrees of freedom</th>
+                            <th>Root Mean Squared Error</th>
+                            <th>R-squared</th>
+                            <th>Adjusted R-Squared</th>
+                            <th>F-statistic vs. constant model</th>
+                            <th>p-value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>
+                              {
+                                lastIteration.regressionMetrics
+                                  .numberOfObservations
+                              }
+                            </td>
+                            <td>
+                              {
+                                lastIteration.regressionMetrics
+                                  .errorDegreesOfFreedom
+                              }
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.RMSE.toFixed(3)}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.R_squared.toFixed(
+                                3
+                              )}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.adjusted_R_squared.toFixed(
+                                3
+                              )}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.F_statistic.toFixed(
+                                2
+                              )}
+                            </td>
+                            <td>
+                              {lastIteration.regressionMetrics.p_value
+                                .toString()
+                                .includes("e")
+                                ? lastIteration.regressionMetrics.p_value.toExponential(
+                                    2
+                                  )
+                                : lastIteration.regressionMetrics.p_value.toFixed(
+                                    10
+                                  )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <textarea
+                      readOnly
+                      className={`${formStyles.textArea}`}
+                      value={`Removed Items Amount: ${lastIteration.removed.length} \n\n[${lastIteration.removed}]`}
+                    ></textarea>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+          <hr />
+          <CollapsibleSection
+            ShownMessage="Hide Fitting Linear Regresion Steps"
+            HiddenMessage="Show Fitting Linear Regresion Steps"
+          >
+            {fittingIterationData.map((iteration, index) => (
+              <div key={index}>
+                <h2>Iteration {index + 1}</h2>
+                <div className={`${tableStyles.table_container}`}>
+                  <table className={`${tableStyles.table}`}>
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Estimate Coefficients</th>
+                        <th>Standard Error</th>
+                        <th>Statistic-T</th>
+                        <th>P-Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {["Intercept", ...iteration.independientVarsLabels].map(
+                        (name, idx) => (
+                          <tr key={idx}>
+                            <td className={`${tableStyles.highlighted_row}`}>
+                              {name}
+                            </td>
+                            <td>
+                              {iteration.regressionData.beta[idx].toFixed(6)}
+                            </td>
+                            <td>
+                              {iteration.regressionData.SE[idx].toFixed(6)}
+                            </td>
+                            <td>
+                              {iteration.regressionData.tStat[idx].toFixed(6)}
+                            </td>
+                            <td>
+                              {iteration.regressionData.pValue[idx]
+                                .toString()
+                                .includes("e")
+                                ? iteration.regressionData.pValue[
+                                    idx
+                                  ].toExponential(2)
+                                : iteration.regressionData.pValue[idx].toFixed(
+                                    10
+                                  )}
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className={`${tableStyles.table_container}`}>
+                  <table className={`${tableStyles.table}`}>
+                    <thead>
+                      <tr>
+                        <th>Number of observations</th>
+                        <th>Error degrees of freedom</th>
+                        <th>Root Mean Squared Error</th>
+                        <th>R-squared</th>
+                        <th>Adjusted R-Squared</th>
+                        <th>F-statistic vs. constant model</th>
+                        <th>p-value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          {iteration.regressionMetrics.numberOfObservations}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.errorDegreesOfFreedom}
+                        </td>
+                        <td>{iteration.regressionMetrics.RMSE.toFixed(3)}</td>
+                        <td>
+                          {iteration.regressionMetrics.R_squared.toFixed(3)}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.adjusted_R_squared.toFixed(
+                            3
+                          )}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.F_statistic.toFixed(2)}
+                        </td>
+                        <td>
+                          {iteration.regressionMetrics.p_value
+                            .toString()
+                            .includes("e")
+                            ? iteration.regressionMetrics.p_value.toExponential(
+                                2
+                              )
+                            : iteration.regressionMetrics.p_value.toFixed(10)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <textarea
+                  readOnly
+                  className={`${formStyles.textArea}`}
+                  value={`Removed Items Amount: ${iteration.removed.length} \n\n[${iteration.removed}]`}
+                ></textarea>
+              </div>
+            ))}
+          </CollapsibleSection>
+          <hr />
         </>
       )}
     </div>
   );
 };
-
-/*
-
-  {regressionIterationData.map((iteration, index) => (
-            <div key={index}>
-              <h2>Iteration {index + 1}</h2>
-              <div className={`${tableStyles.table_container}`}>
-                <table className={`${tableStyles.table}`}>
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Estimate Coefficients</th>
-                      <th>Standard Error</th>
-                      <th>Statistic-T</th>
-                      <th>P-Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {["Intercept", ...iteration.independientVarsLabels].map(
-                      (name, idx) => (
-                        <tr key={idx}>
-                          <td className={`${tableStyles.highlighted_row}`}>
-                            {name}
-                          </td>
-                          <td>
-                            {iteration.regressionData.beta[idx].toFixed(6)}
-                          </td>
-                          <td>{iteration.regressionData.SE[idx].toFixed(6)}</td>
-                          <td>
-                            {iteration.regressionData.tStat[idx].toFixed(6)}
-                          </td>
-                          <td>
-                            {iteration.regressionData.pValue[idx]
-                              .toString()
-                              .includes("e")
-                              ? iteration.regressionData.pValue[
-                                  idx
-                                ].toExponential(2)
-                              : iteration.regressionData.pValue[idx].toFixed(
-                                  10
-                                )}
-                          </td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <div className={`${tableStyles.table_container}`}>
-                <table className={`${tableStyles.table}`}>
-                  <thead>
-                    <tr>
-                      <th>Number of observations</th>
-                      <th>Error degrees of freedom</th>
-                      <th>Root Mean Squared Error</th>
-                      <th>R-squared</th>
-                      <th>Adjusted R-Squared</th>
-                      <th>F-statistic vs. constant model</th>
-                      <th>p-value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        {iteration.regressionMetrics.numberOfObservations}
-                      </td>
-                      <td>
-                        {iteration.regressionMetrics.errorDegreesOfFreedom}
-                      </td>
-                      <td>{iteration.regressionMetrics.RMSE.toFixed(3)}</td>
-                      <td>
-                        {iteration.regressionMetrics.R_squared.toFixed(3)}
-                      </td>
-                      <td>
-                        {iteration.regressionMetrics.adjusted_R_squared.toFixed(
-                          3
-                        )}
-                      </td>
-                      <td>
-                        {iteration.regressionMetrics.F_statistic.toFixed(2)}
-                      </td>
-                      <td>
-                        {iteration.regressionMetrics.p_value
-                          .toString()
-                          .includes("e")
-                          ? iteration.regressionMetrics.p_value.toExponential(2)
-                          : iteration.regressionMetrics.p_value.toFixed(10)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <hr />
-            </div>
-          ))}
-
-*/
 
 export default Page;

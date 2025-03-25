@@ -7,6 +7,7 @@ import formStyles from "../../stylesheets/Form.module.css";
 import tableStyles from "../../stylesheets/Table.module.css";
 import CollapsibleSection from "../../components/CollapsibleSection";
 import Chart from "../../components/chart";
+import Histogram from "../../components/Histogram";
 
 const Page = () => {
   const [rawDataSet, setRawDataSet] = useState([]);
@@ -32,6 +33,7 @@ const Page = () => {
     removed: [],
   });
   const [chartData, setChartData] = useState([]);
+  const [histData, setHistData] = useState([]);
 
   const [toggleContent, setToggleContent] = useState(false);
   const [hasDataInputUpdated, setHasDataInputUpdated] = useState(false);
@@ -185,6 +187,8 @@ const Page = () => {
     let rSquared = 0;
     let adjustedRSquared = 0;
     let fittingRegressionAux = [];
+    let error = [];
+    let errorAbs = [];
     while (
       removedFitting.length < maxRemovals &&
       rSquared <= minPer &&
@@ -209,7 +213,7 @@ const Page = () => {
       });
 
       const yhat = calculateYhat(finalIdependentVars, regressionDataAux.beta);
-      const error = calculateYError(fittingDependent, yhat);
+      [error, errorAbs] = calculateYError(fittingDependent, yhat);
       const maxErrorIndex = error.indexOf(Math.max(...error));
 
       if (maxErrorIndex !== -1) {
@@ -225,10 +229,11 @@ const Page = () => {
       adjustedRSquared = regressionMetricsAux.adjusted_R_squared;
     }
 
-    //setChartData(fittingRegressionAux.regressionMetrics.R_squared);
     const rSquaredValues = fittingRegressionAux.map(
       (iter) => iter.regressionMetrics.R_squared
     );
+
+    setHistData(errorAbs);
     setChartData(rSquaredValues);
     setFittingIterationData(fittingRegressionAux);
     setRegressionIterationData(regressionIterationAux);
@@ -422,7 +427,9 @@ const Page = () => {
       throw new Error("Las longitudes de 'y' y 'yhat' deben ser iguales.");
     }
 
-    return y.map((val, i) => Math.abs(val - yhat[i]));
+    let error = y.map((val, i) => Math.abs(val - yhat[i]));
+    let errorAbs = y.map((val, i) => val - yhat[i]);
+    return [error, errorAbs];
   };
 
   return (
@@ -985,7 +992,13 @@ const Page = () => {
               })()}
             </div>
           )}
+          <h2>R-Squared Progression per Iteration</h2>
           <Chart iterations={chartData}></Chart>
+          <h2>Histogram of the Residuals</h2>
+          <Histogram
+            datasets={[histData, 0]}
+            includeControls={false}
+          ></Histogram>
           <hr />
           <CollapsibleSection
             ShownMessage="Hide Fitting Linear Regresion Steps"

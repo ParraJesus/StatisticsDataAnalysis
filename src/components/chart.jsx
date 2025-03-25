@@ -41,12 +41,7 @@ const Chart = ({ iterations }) => {
 
   const options = {
     responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: "R-Squared Progression per Iteration",
-      },
-    },
+    plugins: {},
     scales: {
       y: {
         beginAtZero: true,

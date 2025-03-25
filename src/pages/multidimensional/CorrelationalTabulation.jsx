@@ -176,10 +176,12 @@ const Page = () => {
 
     let fittingDependent = [...dependentVarAux];
     const maxRemovals = Math.floor(fittingDependent.length * 0.1);
+    const minPer = minFinalPercentage / 100;
+    //const maxRemovals = 1000;
+    //const minPer = 0.95;
     let removedFitting = [];
     let rSquared = 0;
     let adjustedRSquared = 0;
-    const minPer = minFinalPercentage / 100;
     let fittingRegressionAux = [];
     while (
       removedFitting.length < maxRemovals &&

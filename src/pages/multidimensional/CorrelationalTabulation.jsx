@@ -6,6 +6,7 @@ import styles from "../../stylesheets/Layout.module.css";
 import formStyles from "../../stylesheets/Form.module.css";
 import tableStyles from "../../stylesheets/Table.module.css";
 import CollapsibleSection from "../../components/CollapsibleSection";
+import Chart from "../../components/chart";
 
 const Page = () => {
   const [rawDataSet, setRawDataSet] = useState([]);
@@ -30,6 +31,7 @@ const Page = () => {
     independientVarsLabels: [],
     removed: [],
   });
+  const [chartData, setChartData] = useState([]);
 
   const [toggleContent, setToggleContent] = useState(false);
   const [hasDataInputUpdated, setHasDataInputUpdated] = useState(false);
@@ -223,7 +225,11 @@ const Page = () => {
       adjustedRSquared = regressionMetricsAux.adjusted_R_squared;
     }
 
-    //console.log(fittingIterationData);
+    //setChartData(fittingRegressionAux.regressionMetrics.R_squared);
+    const rSquaredValues = fittingRegressionAux.map(
+      (iter) => iter.regressionMetrics.R_squared
+    );
+    setChartData(rSquaredValues);
     setFittingIterationData(fittingRegressionAux);
     setRegressionIterationData(regressionIterationAux);
     setCovarianceMatrix(covMat);
@@ -979,6 +985,7 @@ const Page = () => {
               })()}
             </div>
           )}
+          <Chart iterations={chartData}></Chart>
           <hr />
           <CollapsibleSection
             ShownMessage="Hide Fitting Linear Regresion Steps"
